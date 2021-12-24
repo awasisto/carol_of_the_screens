@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carol of the Screens</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<label for="clientNumber">Client number:</label><br>
+<input type="text" id="clientNumber" name="clientNumber"><br>
+<button id="readyButton" onclick="ready()">Ready</button>
+<button id="playButton" onclick="play()" hidden>Play</button>
+<div id="light" style="position: absolute; top: 0; left: 0; width: 100%; height:100%; z-index: 1;" hidden></div>
+<script>
+    const music = new Audio(document.location.href + 'music');
+
+    const websocket = new WebSocket(document.location.href.replace('http://', 'ws://').replace(/\/$/, '') + '/ws');
+
+    websocket.onmessage = function (event) {
+        const message = JSON.parse(event.data);
+        if (message['action'] === 'lights_out') {
+            $('#light').css('background-color', 'black').show();
+        }
+        if (message['action'] === 'play_music') {
+            music.play();
+        } else if (message['action'] === 'light') {
+            $('#light').css('background-color', message['color']);
+            setTimeout(function () {
+                $('#light').css('background-color', 'black');
+            }, message['duration_seconds'] * 1000)
+        }
+    };
+
+    websocket.onclose = function () {
+        music.pause()
+    }
+
+    function ready() {
+        $('#readyButton').hide();
+        $('#playButton').show();
+        websocket.send(JSON.stringify({action: 'ready', client_number: parseInt($('#clientNumber').val())}));
+    }
+
+    function play() {
+        websocket.send(JSON.stringify({'action': 'play'}));
+    }
+</script>
+</body>
+</html>
