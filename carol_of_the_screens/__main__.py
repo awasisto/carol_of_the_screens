@@ -2,7 +2,6 @@ import csv
 import json
 import sys
 import threading
-import traceback
 from datetime import datetime, timedelta
 from time import sleep
 
@@ -16,6 +15,8 @@ app = Flask(__name__)
 sockets = Sockets(app)
 
 websockets = {}
+
+active_threads = 0
 
 
 @app.route('/')
@@ -73,11 +74,16 @@ def play():
 
 
 def schedule_send(client_number: int, send_at: datetime, message: str):
+    global active_threads
+    active_threads += 1
+    print(f'{active_threads} active threads\n', end='')
     sleep((send_at - datetime.utcnow()).total_seconds())
     try:
         websockets[client_number].send(message)
     except:
         pass
+    active_threads -= 1
+    print(f'{active_threads} active threads\n', end='')
 
 
 server = pywsgi.WSGIServer(('0.0.0.0', 8080), application=app, handler_class=WebSocketHandler)
