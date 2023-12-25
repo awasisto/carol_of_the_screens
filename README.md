@@ -7,6 +7,8 @@ Running
 -------
 
 ```
+# Set your music and light show sheet in the Dockerfile
+
 $ docker build -t carol_of_the_screens .
 $ docker run --name carol_of_the_screens -p 8080:8080 carol_of_the_screens
 ```
