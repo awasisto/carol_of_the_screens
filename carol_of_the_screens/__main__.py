@@ -11,6 +11,17 @@ from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket.websocket import WebSocket
 
+
+client_numbers = set()
+with open(sys.argv[2], newline='') as f:
+    reader = csv.reader(f, delimiter=',')
+    for row in reader:
+        if len(row) > 2:
+            client_numbers.add(row[2])
+
+print('Client numbers needed:', ', '.join(sorted(client_numbers)))
+
+
 app = Flask(__name__)
 sockets = Sockets(app)
 
