@@ -3,6 +3,8 @@ Carol of the Screens
 
 Create a light show using multiple computer or phone screens.
 
+![](demo.gif)
+
 Running
 -------
 
